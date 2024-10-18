@@ -1,0 +1,129 @@
+let backgroundImg;
+let boy;
+let rotationAngle = 0; 
+let boy_x = -100;
+let boy_y = 0;
+let batArray = [];
+let dodgeSound;
+let start_button;
+let game_state = "start";
+
+function setup() {
+  createCanvas(800, 550);
+  angleMode(DEGREES);
+  start_button = createButton('start');
+  start_button.size(200, 100); 
+  start_button.position(width / 2 - start_button.width / 2, height / 2 -   start_button.height / 2);
+  start_button.style('font-size', '20px');
+  start_button.mousePressed(onButtonClick);
+}
+
+function draw() {
+  background(backgroundImg);
+  
+  if (game_state == "playing"){
+  
+    for (let i = 0; i< batArray.length; i++) {
+      if (batArray[i].y_position > height) {
+        batArray.splice(i, 1);
+      } else {
+      batArray[i].move();
+      batArray[i].display();
+      }
+    }
+    if (keyIsPressed) {
+      if(keyCode == LEFT_ARROW) {
+        rotate_character(-45);
+        //dodgeSound.play();
+      } else if(keyCode == RIGHT_ARROW) {
+        rotate_character(45);
+          //dodgeSound.play();
+      }
+    }
+    if (frameCount % 90 === 0) {
+      if (random() > 0.5) {
+        //batArray.push(new Enemy(-70, random(height - 70)));
+        batArray.push(new batEnemy(width/2-70, 0));
+      } else {
+        //batArray.push(new Enemy(width, random(height - 70)));
+        batArray.push(new batEnemy(width/2+70, 0));
+      }
+    }
+  }
+  
+  push();
+  //imageMode(CENTER);
+  translate(width/2, height-50);
+  rotate(rotationAngle);
+  image(boy, boy_x, -150, 200, 200);
+  pop();
+  //console.log("angle: " + rotationAngle);
+  
+//   let x1 = (width/2-100) + ((-100) * cos(rotationAngle) - (100) * sin(rotationAngle))
+//   let y1 = (height-200) + ((-100) * sin(rotationAngle)  + (100) * cos(rotationAngle))
+//   let x2 = (width/2+100) + ((100) * cos(rotationAngle) - (100) * sin(rotationAngle))
+//   let y2 = (height-100) + ((100) * sin(rotationAngle)  - (100) * cos(rotationAngle))
+//   console.log()
+//     //console.log("x: " + x1);
+  
+//   console.log("y: " + y1);
+
+}
+
+function onButtonClick() {
+  start_button.hide();
+  bgm.play();
+  bgm.setVolume(0.1);
+  bgm.loop();
+  // Add your code here to be executed when the button is clicked
+  game_state = "playing";
+}
+
+
+function hitHappened(x, y) {
+  if (dist(boy)) {
+    
+  }
+}
+
+function preload() {
+  backgroundImg = loadImage('assets/background_img.jpg');
+  boy = loadImage('assets/da_boy.png');
+  
+  soundFormats("mp3");
+  dodgeSound = loadSound('assets/whoosh_sound_effect');
+  bgm = loadSound('assets/in-deep-distress-112438')
+}
+
+function rotate_character(targetAngle) {
+    let easing = 0.1;
+    let diff = targetAngle - rotationAngle;
+    if (abs(diff) > 1) {
+      rotationAngle += diff * easing;
+    } else {
+        rotationAngle = targetAngle;
+    }
+}
+
+class batEnemy {
+  constructor(x, y) {
+    this.batImg = loadImage('assets/evil_bat.png');
+    this.x_position = x;
+    this.y_position = y;
+  }
+  
+  get_y_position() {
+    return this.y_position;
+  }
+  
+  display() {
+    push();
+    imageMode(CENTER);
+    image(this.batImg, this.x_position, this.y_position, 60, 60);
+    pop();
+  }
+  
+  move() {
+    this.y_position += 2;
+  }
+}
